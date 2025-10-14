@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Captcha Solver</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <style>body{font-family:system-ui,Segoe UI,Arial;margin:2rem;max-width:800px}</style>
+</head>
+<body>
+  <h1>Captcha Solver</h1>
+  <p>Pass an image via <code>?url=...</code>. Falls back to <code>sample.png</code> if present.</p>
+  <img id="captcha" alt="captcha" style="max-width:100%;border:1px solid #ccc;padding:8px">
+  <pre id="status" aria-live="polite">idle…</pre>
+  <h2>Result</h2>
+  <div id="result" style="font-size:1.25rem;font-weight:700;"></div>
+  <script>
+    const qs = new URLSearchParams(location.search);
+    const url = qs.get('url') || 'sample.png';
+    const img = document.getElementById('captcha');
+    img.src = url;
+    const status = document.getElementById('status');
+    const result = document.getElementById('result');
+    (async () => {
+      try {
+        status.textContent = 'Solving…';
+        const { data: { text } } = await Tesseract.recognize(url, 'eng', {
+          logger: m => (status.textContent = m.status || m.progress || JSON.stringify(m))
+        });
+        result.textContent = (text || '').trim();
+        status.textContent = 'Done';
+      } catch (e) {
+        status.textContent = 'Failed: ' + (e.message || e);
+      }
+    })();
+  </script>
+</body>
+</html>
