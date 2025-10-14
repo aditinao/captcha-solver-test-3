@@ -4,29 +4,39 @@
   <meta charset="utf-8">
   <title>Captcha Solver</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <style>body{font-family:system-ui,Segoe UI,Arial;margin:2rem;max-width:800px}</style>
+  <!-- ✅ Use Tesseract v4 (stable WASM build) -->
+  <script src="https://unpkg.com/tesseract.js@v4.0.2/dist/tesseract.min.js"></script>
+  <style>
+    body { font-family: system-ui, Segoe UI, Arial; margin: 2rem; max-width: 800px; }
+    img { max-width: 100%; border: 1px solid #ccc; padding: 8px; }
+  </style>
 </head>
 <body>
   <h1>Captcha Solver</h1>
   <p>Pass an image via <code>?url=...</code>. Falls back to <code>sample.png</code> if present.</p>
-  <img id="captcha" alt="captcha" style="max-width:100%;border:1px solid #ccc;padding:8px">
+
+  <img id="captcha" alt="captcha">
   <pre id="status" aria-live="polite">idle…</pre>
   <h2>Result</h2>
   <div id="result" style="font-size:1.25rem;font-weight:700;"></div>
+
   <script>
     const qs = new URLSearchParams(location.search);
     const url = qs.get('url') || 'sample.png';
     const img = document.getElementById('captcha');
-    img.src = url;
     const status = document.getElementById('status');
     const result = document.getElementById('result');
+    img.src = url;
+
     (async () => {
       try {
         status.textContent = 'Solving…';
+        // Fail-safe timeout (15s)
+        const timeout = setTimeout(() => { throw new Error('Timeout after 15s'); }, 15000);
         const { data: { text } } = await Tesseract.recognize(url, 'eng', {
-          logger: m => (status.textContent = m.status || m.progress || JSON.stringify(m))
+          logger: m => { if (m.status) status.textContent = m.status; }
         });
+        clearTimeout(timeout);
         result.textContent = (text || '').trim();
         status.textContent = 'Done';
       } catch (e) {
