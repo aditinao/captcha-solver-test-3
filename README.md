@@ -58,6 +58,13 @@ Hugging Face Spaces for backend hosting
 
 ---
 
+### Backend
+The FastAPI backend used to automate build/deploy runs on Hugging Face Spaces.
+A copy of the source is included in [/backend/app.py](backend/app.py) for transparency.
+Secrets are provided via environment variables on the hosting platform.
+
+---
+
 ## Created By
 Generated and deployed automatically through the LLM Code Deployment Pipeline.
 Maintained by Aditi Naoroibam
