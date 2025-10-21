@@ -2,7 +2,6 @@
 
 ## Description
 AI Captcha Solver is a lightweight, browser-based application that detects and solves text-based captchas using Tesseract.js.  
-The project was automatically generated and deployed through an LLM Code Deployment pipeline using FastAPI, GitHub Actions, and GitHub Pages.
 
 It accepts an image via a URL parameter (`?url=...`) or falls back to a sample image included in the repository.
 
